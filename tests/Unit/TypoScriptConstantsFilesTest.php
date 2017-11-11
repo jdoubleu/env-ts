@@ -29,13 +29,20 @@ class TypoScriptConstantsFilesTest extends \PHPUnit_Framework_TestCase
         $mockedPackage->expects($this->any())
             ->method('getExtra')
             ->willReturn(['helhum/env-ts' => ['files' => [
-                'Config/TS/Evn.t3s' => ['FOO_']
+                'Config/TS/Evn.t3s' => [
+                    'FOO_',
+                    'BAR_' => true,
+                    'BAZ_' => false
+                ]
             ]]]);
         $root = vfsStream::setup('package-dir');
         $root->addChild(vfsStream::newDirectory('foo'));
         $config = PackageConfig::createFromPackage($mockedPackage, 'vfs://package-dir/foo');
         $_ENV['FOO_BAR__BAZ'] = 'foobarbaz';
         $_ENV['FOO_BLA__BAZ'] = 'fooblabaz';
+        $_ENV['BAR_ANOTHER_VAR'] = 'fooblabaz';
+        $_ENV['BAR__FOO__BAZ'] = 'fooblabaz';
+        $_ENV['BAZ_BAZ__BAR'] = 'fooblabaz';
 
         $constantsFile = new TypoScriptConstantsFiles($config);
         $constantsFile->write();
@@ -45,6 +52,14 @@ class TypoScriptConstantsFilesTest extends \PHPUnit_Framework_TestCase
             'environment.fooBar.baz = foobarbaz'
             . chr(10)
             . 'environment.fooBla.baz = fooblabaz'
+            . chr(10)
+            . chr(10)
+            . 'environment.anotherVar = fooblabaz'
+            . chr(10)
+            . 'environment.foo.baz = fooblabaz'
+            . chr(10)
+            . chr(10)
+            . 'environment.bazBaz.bar = fooblabaz'
             . chr(10),
             $fileContent
         );
