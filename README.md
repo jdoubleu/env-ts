@@ -36,6 +36,21 @@ By default environment variables are passed as is to the constants file.
 But it is possible to specify a prefix for the constants.
 In the above example `environment.page.root` is written for env var `PAGE__ROOT`
 
+You can also strip the prefix from the constant names.
+To do so, the prefix needs to be the key, having a boolean value controlling whether or
+not to strip the prefix. 
+```
+	"files": {
+		"path/to/environment.t3s": [
+			"PAGE__",
+			"TYPOSCRIPT__" => true,
+			"TSCONFIG_" => false
+		]
+	}
+```
+Given the environment variable `TYPOSCRIPT__CONFIG__DEBUG = 1` would compile to `environment.config.debug = 1` 
+including the other constants as expected.
+
 *The default value* is `environment`
 
 #### `array-delimiter` [string]
