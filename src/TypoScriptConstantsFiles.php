@@ -80,8 +80,13 @@ class TypoScriptConstantsFiles
     private function generateContentFromPrefixes(array $prefixes)
     {
         $content = '';
-        foreach ($prefixes as $prefix) {
-            $content .= $this->generateContentFromPrefix($prefix) . chr(10);
+        foreach ($prefixes as $prefix => $prefixOpts) {
+            if (is_numeric($prefix)) {
+                $content .= $this->generateContentFromPrefix($prefixOpts, false);
+            } else {
+                $content .= $this->generateContentFromPrefix($prefix, $prefixOpts);
+            }
+            $content .= chr(10);
         }
         $content = trim($content);
         return $content ? $content . chr(10) : '';
@@ -89,16 +94,17 @@ class TypoScriptConstantsFiles
 
     /**
      * @param string $prefix
+     * @param boolean $stripPrefix
      * @return string
      */
-    private function generateContentFromPrefix($prefix)
+    private function generateContentFromPrefix($prefix, $stripPrefix = false)
     {
         $content = '';
         foreach ($_ENV as $varName => $value) {
             if (strpos($varName, $prefix) === 0) {
                 $content .= sprintf(
                     '%s = %s',
-                    $this->getConstantVarName($varName),
+                    $this->getConstantVarName($stripPrefix ? str_replace($prefix, '', $varName) : $varName),
                     $_ENV[$varName]
                 );
                 $content .= chr(10);
